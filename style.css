@@ -1,0 +1,265 @@
+:root {
+    --primary-color: #C41E3A;
+    --secondary-color: #FFD700;
+    --bg-gradient-start: #1a0000;
+    --bg-gradient-end: #4a0000;
+    --text-color: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    transition: background 0.5s ease;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.theme-blue {
+    --primary-color: #1E3A8A;
+    --secondary-color: #60A5FA;
+    --bg-gradient-start: #0a1628;
+    --bg-gradient-end: #1e3a5f;
+}
+
+.theme-purple {
+    --primary-color: #7C3AED;
+    --secondary-color: #A78BFA;
+    --bg-gradient-start: #1a0a2e;
+    --bg-gradient-end: #3d1f78;
+}
+
+.countdown-card {
+    animation: fadeInUp 0.6s ease-out;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.countdown-card:nth-child(1) { animation-delay: 0.1s; }
+.countdown-card:nth-child(2) { animation-delay: 0.2s; }
+.countdown-card:nth-child(3) { animation-delay: 0.3s; }
+.countdown-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.countdown-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    transform: scale(1.05);
+}
+
+#days, #hours, #minutes, #seconds {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.number-change {
+    animation: numberPulse 0.3s ease-out;
+}
+
+@keyframes numberPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.theme-btn {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.theme-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.theme-btn.active {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.celebration-text {
+    background: linear-gradient(90deg, 
+        var(--secondary-color), 
+        #ffffff, 
+        var(--secondary-color));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+}
+
+#celebrationContainer {
+    animation: fadeInScale 0.8s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#resetBtn {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+#resetBtn:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    transform: scale(1.05);
+}
+
+#resetBtn:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+    .countdown-card {
+        padding: 1.5rem;
+    }
+    
+    #days, #hours, #minutes, #seconds {
+        font-size: 2.5rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    #days, #hours, #minutes, #seconds {
+        font-size: 3.5rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    #days, #hours, #minutes, #seconds {
+        font-size: 4.5rem;
+    }
+}
+
+@keyframes firework {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+.firework-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    animation: firework 1s ease-out forwards;
+}
+
+.glow-effect {
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px var(--secondary-color));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px var(--secondary-color));
+    }
+}
+
+.scroll-indicator {
+    animation: scrollDown 2s ease-in-out infinite;
+}
+
+@keyframes scrollDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+}
+
+.loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--secondary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
