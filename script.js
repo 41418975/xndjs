@@ -13,6 +13,7 @@ class CountdownTimer {
         this.originalTargetDate = null;
         this.originalEventName = '';
         this.isEventCountdownMode = false;
+        this.isInitialized = false;
         
         this.mouse = {
             x: null,
@@ -61,7 +62,13 @@ class CountdownTimer {
         this.lastTime = 0;
         this.deltaTime = 0;
         
-        this.init();
+        try {
+            this.init();
+            this.isInitialized = true;
+            console.log('✅ CountdownTimer 初始化成功');
+        } catch (error) {
+            console.error('❌ CountdownTimer 初始化失败:', error);
+        }
     }
 
     init() {
@@ -2438,5 +2445,36 @@ class ShareManager {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new CountdownTimer();
+    try {
+        console.log('🚀 页面加载完成，开始初始化...');
+        console.log('📍 当前URL:', window.location.href);
+        console.log('📍 协议:', window.location.protocol);
+        console.log('📍 主机:', window.location.host);
+        
+        const countdownTimer = new CountdownTimer();
+        
+        if (countdownTimer.isInitialized) {
+            console.log('✅ 所有组件初始化成功');
+        } else {
+            console.warn('⚠️ 部分组件可能未正确初始化');
+        }
+        
+        window.countdownTimer = countdownTimer;
+        window.addEventListener('error', (e) => {
+            console.error('🔴 全局错误:', e.message, 'at', e.filename, ':', e.lineno);
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('🔴 未处理的Promise拒绝:', e.reason);
+        });
+        
+    } catch (error) {
+        console.error('🔴 初始化失败:', error);
+        console.error('错误堆栈:', error.stack);
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,0,0,0.9);color:white;padding:20px;border-radius:10px;z-index:99999;max-width:80%;text-align:center;';
+        errorDiv.innerHTML = `<h3>⚠️ 加载错误</h3><p>${error.message}</p><p style="font-size:12px;opacity:0.8;">请刷新页面或检查控制台</p>`;
+        document.body.appendChild(errorDiv);
+    }
 });
