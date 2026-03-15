@@ -1,4 +1,21 @@
 /*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://music.163.com; img-src 'self' data: https:; connect-src 'self' https:;
+  X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/*.html
+  Content-Type: text/html; charset=utf-8
+
+/*.css
+  Content-Type: text/css; charset=utf-8
+
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+
+/*.json
+  Content-Type: application/json; charset=utf-8
+
+/*
+  Cache-Control: public, max-age=0, must-revalidate
