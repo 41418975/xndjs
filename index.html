@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="跨年倒计时网站 - 精美的新年倒计时，支持自定义事件、主题切换、粒子特效">
+    <meta name="keywords" content="倒计时,新年倒计时,跨年,倒计时网站,事件管理">
+    <meta name="author" content="晚梦">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#7C3AED">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://music.163.com https://*.music.163.com; img-src 'self' data: https: blob:; connect-src 'self' https:;">
+    <base href="/">
+    <title>跨年倒计时 - 迎接新年</title>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com" defer></script>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+    <canvas id="particleCanvas" class="fixed top-0 left-0 w-full h-full z-0"></canvas>
+    
+    <div class="relative z-10 min-h-screen flex flex-col">
+        <header class="py-6 px-4">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-white drop-shadow-lg" id="siteTitle">
+                    🎊 跨年倒计时
+                </h1>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <div id="musicPlayer" class="music-player-container">
+                        <button id="musicPlayerToggle" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30 flex items-center gap-2">
+                            <span class="text-lg">🎵</span>
+                            <span class="text-white/90">音乐</span>
+                            <span id="musicPlayerArrow" class="text-white/60 transition-transform duration-300">▲</span>
+                        </button>
+                        <div id="musicPlayerContent" class="hidden absolute right-0 mt-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden shadow-2xl z-50" style="min-width: 330px;">
+                            <div class="p-4 text-center">
+                                <p class="text-white/80 text-sm mb-3">🎵 网易云音乐</p>
+                                <iframe id="neteaseMusicFrame" frameborder="no" border="0" marginwidth="0" marginheight="0" width="280" height="280" src="https://music.163.com/outchain/player?type=0&id=17781138096&auto=0&height=430" style="border-radius: 8px;"></iframe>
+                                <p class="text-white/50 text-xs mt-2">如无法播放，请检查歌单是否有效</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="settingsBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30 flex items-center justify-center" title="设置">
+                        ⚙️
+                    </button>
+                    <button id="eventsBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30 flex items-center justify-center" title="事件管理">
+                        📅
+                    </button>
+                    <button id="shareBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30 flex items-center justify-center" title="分享">
+                        📤
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main class="flex-grow flex items-center justify-center px-4 py-8">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-xl md:text-2xl text-white/90 mb-2" id="countdownTitle">距离新年还有</h2>
+                    <p class="text-lg text-white/70" id="targetYear"></p>
+                </div>
+
+                <div id="countdownContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-12">
+                    <div class="countdown-card bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                        <div class="flip-clock-wrapper">
+                            <div class="flip-clock" id="daysFlip">
+                                <div class="flip-clock-inner">
+                                    <span class="flip-digit" id="days">00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm md:text-base text-white/80">天</div>
+                    </div>
+                    <div class="countdown-card bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                        <div class="flip-clock-wrapper">
+                            <div class="flip-clock" id="hoursFlip">
+                                <div class="flip-clock-inner">
+                                    <span class="flip-digit" id="hours">00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm md:text-base text-white/80">时</div>
+                    </div>
+                    <div class="countdown-card bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                        <div class="flip-clock-wrapper">
+                            <div class="flip-clock" id="minutesFlip">
+                                <div class="flip-clock-inner">
+                                    <span class="flip-digit" id="minutes">00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm md:text-base text-white/80">分</div>
+                    </div>
+                    <div class="countdown-card bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                        <div class="flip-clock-wrapper">
+                            <div class="flip-clock" id="secondsFlip">
+                                <div class="flip-clock-inner">
+                                    <span class="flip-digit" id="seconds">00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm md:text-base text-white/80">秒</div>
+                    </div>
+                </div>
+
+                <div id="celebrationContainer" class="hidden">
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 md:p-12 border border-white/20 mb-8">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 animate-bounce" id="celebrationTitle">🎉 新年快乐！</h2>
+                        <p class="text-xl md:text-2xl text-white/90 mb-6" id="celebrationMessage">祝您新年快乐，万事如意！</p>
+                        <div class="text-lg text-white/80 space-y-2">
+                            <p>✨ 愿新的一年充满希望与喜悦</p>
+                            <p>🌟 愿您心想事成，梦想成真</p>
+                            <p>💫 愿幸福与快乐常伴左右</p>
+                        </div>
+                    </div>
+                    <button id="resetBtn" class="bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30">
+                        重新开始倒计时
+                    </button>
+                </div>
+
+                <div id="messageContainer" class="mt-8">
+                    <p class="text-white/70 text-sm md:text-base">
+                        设置中可以选择切换不同的主题
+                    </p>
+                </div>
+
+                <div class="progress-section mt-8 max-w-2xl mx-auto">
+                    <div class="flex justify-between text-white/60 text-sm mb-2">
+                        <span>年初</span>
+                        <span id="progressPercent">0%</span>
+                        <span>年末</span>
+                    </div>
+                    <div class="progress-bar-container h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+                        <div id="yearProgress" class="progress-bar h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <p class="text-white/50 text-xs mt-2 text-center" id="progressText">年度进度</p>
+                </div>
+
+                <div class="shortcuts-hint mt-6 text-center">
+                    <p class="text-white/40 text-xs">
+                        快捷键(仅限电脑🖥️): <span class="text-white/60">M</span> 音乐 | 
+                        <span class="text-white/60">S</span> 设置 | 
+                        <span class="text-white/60">E</span> 事件 |
+                        <span class="text-white/60">P</span> 分享
+                    </p>
+                </div>
+
+                <div id="settingsPanel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div class="settings-content bg-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/20 max-w-lg w-full mx-4 shadow-2xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-white">⚙️ 设置</h3>
+                            <button id="closeSettings" class="text-white/70 hover:text-white text-2xl transition-colors">&times;</button>
+                        </div>
+                        
+                        <div class="settings-tabs flex gap-2 mb-6">
+                            <button class="settings-tab active" data-tab="countdown">📅 倒计时</button>
+                            <button class="settings-tab" data-tab="theme">🎨 主题</button>
+                        </div>
+                        
+                        <div id="countdownSettingsTab" class="settings-tab-content">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-white/90 text-sm font-medium mb-2">倒计时目标日期</label>
+                                    <input type="date" id="targetDateInput" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40 transition-colors">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-white/90 text-sm font-medium mb-2">倒计时名称（可选）</label>
+                                    <input type="text" id="eventNameInput" placeholder="例如：生日、考试、纪念日..." class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 transition-colors">
+                                </div>
+                                
+                                <button id="saveSettings" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white px-4 py-3 rounded-lg font-medium transition-all shadow-lg">
+                                    保存设置
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="themeSettingsTab" class="settings-tab-content hidden">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-white/90 text-sm font-medium mb-3">🎨 精选主题 (ui-ux-pro-max 推荐)</label>
+                                    <div class="color-theme-selector grid grid-cols-5 gap-3 mb-4">
+                                        <button class="color-theme-btn active" data-theme="festival" title="节日庆典 - 活力四射">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #7C3AED, #F97316);"></span>
+                                            <span class="color-label">🎉 庆典</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="neon" title="深夜霓虹 - OLED优化 (推荐)">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #7C3AED, #F43F5E);"></span>
+                                            <span class="color-label">🌃 霓虹</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="luxury" title="奢华金夜 - 高端大气">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #1C1917, #CA8A04);"></span>
+                                            <span class="color-label">💎 奢华</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="space" title="星空科技 - 宇宙背景 (推荐)">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #0B0B10, #3B82F6);"></span>
+                                            <span class="color-label">🚀 星空</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="soft" title="温馨柔和 - 家庭友好">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #F472B6, #22C55E);"></span>
+                                            <span class="color-label">🌸 柔和</span>
+                                        </button>
+                                    </div>
+                                    <label class="block text-white/70 text-xs mb-2">经典主题</label>
+                                    <div class="color-theme-selector grid grid-cols-6 gap-2">
+                                        <button class="color-theme-btn" data-theme="red" title="中国红">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #C41E3A, #FFD700);"></span>
+                                            <span class="color-label">红色</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="blue" title="海洋蓝">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #1E3A8A, #60A5FA);"></span>
+                                            <span class="color-label">蓝色</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="purple" title="梦幻紫">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #7C3AED, #C4B5FD);"></span>
+                                            <span class="color-label">紫色</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="gold" title="尊贵金">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #D4AF37, #FFF8DC);"></span>
+                                            <span class="color-label">金色</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="emerald" title="翡翠绿">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #10B981, #6EE7B7);"></span>
+                                            <span class="color-label">绿色</span>
+                                        </button>
+                                        <button class="color-theme-btn" data-theme="black" title="经典黑">
+                                            <span class="color-preview" style="background: linear-gradient(135deg, #0a0a0a, #4a4a4a); border: 1px solid rgba(255,255,255,0.3);"></span>
+                                            <span class="color-label">黑色</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-white/90 text-sm font-medium mb-3">字体大小</label>
+                                    <div class="font-size-control">
+                                        <div class="flex justify-between text-white/60 text-xs mb-2">
+                                            <span>小</span>
+                                            <span id="fontSizeValue">100%</span>
+                                            <span>大</span>
+                                        </div>
+                                        <input type="range" id="fontSizeSlider" min="80" max="120" value="100" class="font-size-slider">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-white/90 text-sm font-medium mb-3">主题预览</label>
+                                    <div class="theme-preview-box">
+                                        <div class="preview-header">
+                                            <span class="preview-title">预览标题</span>
+                                            <span class="preview-badge">标签</span>
+                                        </div>
+                                        <div class="preview-countdown">
+                                            <div class="preview-number">00</div>
+                                            <div class="preview-number">00</div>
+                                            <div class="preview-number">00</div>
+                                        </div>
+                                        <div class="preview-text">预览文本内容</div>
+                                    </div>
+                                </div>
+                                
+                                <button id="saveThemeSettings" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white px-4 py-3 rounded-lg font-medium transition-all shadow-lg">
+                                    应用主题设置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="eventsPanel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div class="events-content bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 w-full mx-4 shadow-2xl flex flex-col" style="max-width: 900px; max-height: 90vh;">
+                        <div class="flex justify-between items-center p-4 md:p-6 border-b border-white/10">
+                            <h3 class="text-xl font-bold text-white">📅 事件管理</h3>
+                            <button id="closeEvents" class="text-white/70 hover:text-white text-2xl transition-colors">&times;</button>
+                        </div>
+                        
+                        <div class="flex-1 overflow-hidden flex flex-col md:flex-row">
+                            <div class="w-full md:w-80 p-4 md:p-6 border-b md:border-b-0 md:border-r border-white/10 flex flex-col">
+                                <div class="flex gap-2 mb-4">
+                                    <input type="text" id="eventSearchInput" placeholder="搜索事件..." class="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-white/40">
+                                    <select id="eventFilterCategory" class="bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-white/40">
+                                        <option value="">全部类别</option>
+                                        <option value="work">工作</option>
+                                        <option value="personal">个人</option>
+                                        <option value="study">学习</option>
+                                        <option value="health">健康</option>
+                                        <option value="social">社交</option>
+                                        <option value="birthday">生日</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="flex gap-2 mb-4">
+                                    <select id="eventFilterPriority" class="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-white/40">
+                                        <option value="">全部优先级</option>
+                                        <option value="high">高</option>
+                                        <option value="medium">中</option>
+                                        <option value="low">低</option>
+                                    </select>
+                                    <select id="eventFilterStatus" class="flex-1 bg-white/10 border border-white/20 rounded-lg px-2 py-2 text-white text-sm focus:outline-none focus:border-white/40">
+                                        <option value="">全部状态</option>
+                                        <option value="active">进行中</option>
+                                        <option value="completed">已完成</option>
+                                        <option value="archived">已归档</option>
+                                    </select>
+                                </div>
+
+                                <div id="eventsList" class="flex-1 overflow-y-auto space-y-2 min-h-0">
+                                </div>
+                                
+                                <button id="addEventBtn" class="mt-4 w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-4 py-3 rounded-lg font-medium transition-all shadow-lg flex items-center justify-center gap-2">
+                                    <span>➕</span> 添加新事件
+                                </button>
+                                
+                                <button id="resetToNewYear" class="mt-2 w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all border border-white/20 text-sm">
+                                    🎊 恢复新年倒计时
+                                </button>
+                            </div>
+                            
+                            <div class="flex-1 p-4 md:p-6 overflow-y-auto">
+                                <div id="eventFormContainer" class="hidden">
+                                    <h4 class="text-lg font-semibold text-white mb-4" id="eventFormTitle">添加新事件</h4>
+                                    <form id="eventForm" class="space-y-4">
+                                        <input type="hidden" id="eventId">
+                                        
+                                        <div>
+                                            <label class="block text-white/90 text-sm font-medium mb-2">事件名称 *</label>
+                                            <input type="text" id="eventTitle" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40" placeholder="输入事件名称">
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-white/90 text-sm font-medium mb-2">日期 *</label>
+                                                <input type="date" id="eventDate" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40">
+                                            </div>
+                                            <div>
+                                                <label class="block text-white/90 text-sm font-medium mb-2">时间</label>
+                                                <input type="time" id="eventTime" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-white/90 text-sm font-medium mb-2">类别</label>
+                                                <select id="eventCategory" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40">
+                                                    <option value="work">工作</option>
+                                                    <option value="personal">个人</option>
+                                                    <option value="study">学习</option>
+                                                    <option value="health">健康</option>
+                                                    <option value="social">社交</option>
+                                                    <option value="birthday">生日</option>
+                                                    <option value="other">其他</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-white/90 text-sm font-medium mb-2">优先级</label>
+                                                <select id="eventPriority" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40">
+                                                    <option value="high">高</option>
+                                                    <option value="medium" selected>中</option>
+                                                    <option value="low">低</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-white/90 text-sm font-medium mb-2">标签（用逗号分隔）</label>
+                                            <input type="text" id="eventTags" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40" placeholder="例如：重要, 紧急, 项目A">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-white/90 text-sm font-medium mb-2">详细描述</label>
+                                            <textarea id="eventDescription" rows="3" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 resize-none" placeholder="输入详细描述..."></textarea>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="checkbox" id="eventReminder" class="w-5 h-5 rounded bg-white/10 border-white/20 text-green-500 focus:ring-green-500">
+                                            <label for="eventReminder" class="text-white/90 text-sm">启用提醒</label>
+                                        </div>
+                                        
+                                        <div id="reminderSettings" class="hidden space-y-3 pl-8">
+                                            <div>
+                                                <label class="block text-white/90 text-sm font-medium mb-2">提醒时间</label>
+                                                <select id="reminderTime" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/40">
+                                                    <option value="0">事件开始时</option>
+                                                    <option value="5">提前5分钟</option>
+                                                    <option value="15">提前15分钟</option>
+                                                    <option value="30">提前30分钟</option>
+                                                    <option value="60">提前1小时</option>
+                                                    <option value="1440">提前1天</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex gap-3 pt-2">
+                                            <button type="button" id="cancelEventBtn" class="flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg font-medium transition-all border border-white/20">
+                                                取消
+                                            </button>
+                                            <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-4 py-3 rounded-lg font-medium transition-all shadow-lg">
+                                                保存事件
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <div id="eventDetailContainer" class="hidden">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h4 class="text-xl font-semibold text-white" id="detailTitle"></h4>
+                                        <div class="flex gap-2">
+                                            <button id="editEventBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-lg text-sm transition-all">
+                                                ✏️ 编辑
+                                            </button>
+                                            <button id="deleteEventBtn" class="bg-red-500/20 hover:bg-red-500/40 text-red-300 px-3 py-2 rounded-lg text-sm transition-all">
+                                                🗑️ 删除
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-center gap-3 text-white/80">
+                                            <span class="text-lg">📆</span>
+                                            <span id="detailDateTime"></span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-lg">📁</span>
+                                            <span id="detailCategory" class="px-3 py-1 rounded-full text-sm"></span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-lg">⚡</span>
+                                            <span id="detailPriority" class="px-3 py-1 rounded-full text-sm"></span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-lg">📊</span>
+                                            <span id="detailStatus" class="px-3 py-1 rounded-full text-sm"></span>
+                                        </div>
+                                        
+                                        <div id="detailTagsContainer" class="flex items-start gap-3">
+                                            <span class="text-lg">🏷️</span>
+                                            <div id="detailTags" class="flex flex-wrap gap-2"></div>
+                                        </div>
+                                        
+                                        <div id="detailDescriptionContainer" class="hidden">
+                                            <div class="flex items-start gap-3">
+                                                <span class="text-lg">📝</span>
+                                                <p id="detailDescription" class="text-white/80 whitespace-pre-wrap"></p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="detailReminderContainer" class="hidden">
+                                            <div class="flex items-center gap-3 text-white/80">
+                                                <span class="text-lg">🔔</span>
+                                                <span id="detailReminder"></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex gap-3 pt-4 border-t border-white/10">
+                                            <button id="countdownModeBtn" class="flex-1 bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 px-4 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2">
+                                                <span>⏱️</span> <span id="countdownModeText">倒计时模式</span>
+                                            </button>
+                                            <button id="completeEventBtn" class="flex-1 bg-green-500/20 hover:bg-green-500/40 text-green-300 px-4 py-3 rounded-lg font-medium transition-all">
+                                                ✓ 标记完成
+                                            </button>
+                                            <button id="archiveEventBtn" class="flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-lg font-medium transition-all">
+                                                📦 归档
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="noEventSelected" class="flex flex-col items-center justify-center h-full text-white/50">
+                                    <span class="text-6xl mb-4">📋</span>
+                                    <p class="text-lg">选择一个事件查看详情</p>
+                                    <p class="text-sm mt-2">或点击"添加新事件"创建</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 分享面板 -->
+        <div id="sharePanel" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="share-content bg-white/10 backdrop-blur-xl rounded-2xl p-6 md:p-8 border border-white/20 max-w-md w-full mx-4 shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-white">📤 分享倒计时</h3>
+                    <button id="closeShare" class="text-white/70 hover:text-white text-2xl transition-colors">&times;</button>
+                </div>
+                
+                <!-- 分享预览卡片 -->
+                <div class="share-preview-card mb-6 p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-white/20">
+                    <div class="text-center">
+                        <p class="text-white/80 text-sm mb-2" id="shareEventName">跨年倒计时</p>
+                        <div class="flex justify-center gap-2 mb-2">
+                            <span class="bg-white/20 px-3 py-1 rounded-lg text-white font-bold" id="shareDays">00</span>
+                            <span class="text-white/60">天</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-lg text-white font-bold" id="shareHours">00</span>
+                            <span class="text-white/60">时</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-lg text-white font-bold" id="shareMinutes">00</span>
+                            <span class="text-white/60">分</span>
+                        </div>
+                        <p class="text-white/60 text-xs" id="shareTargetDate">目标日期</p>
+                    </div>
+                </div>
+                
+                <!-- 社交平台按钮 -->
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <button class="share-platform-btn flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all" data-platform="wechat">
+                        <span class="text-2xl">💬</span>
+                        <span class="text-xs text-white/70">微信</span>
+                    </button>
+                    <button class="share-platform-btn flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all" data-platform="weibo">
+                        <span class="text-2xl">🔴</span>
+                        <span class="text-xs text-white/70">微博</span>
+                    </button>
+                    <button class="share-platform-btn flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all" data-platform="qq">
+                        <span class="text-2xl">🐧</span>
+                        <span class="text-xs text-white/70">QQ</span>
+                    </button>
+                    <button class="share-platform-btn flex flex-col items-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all" data-platform="qzone">
+                        <span class="text-2xl">⭐</span>
+                        <span class="text-xs text-white/70">空间</span>
+                    </button>
+                </div>
+                
+                <!-- 二维码区域 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-white/80 text-sm">📱 扫码分享</span>
+                        <button id="refreshQRCode" class="text-white/60 hover:text-white text-xs flex items-center gap-1">
+                            🔄 刷新
+                        </button>
+                    </div>
+                    <div class="qrcode-container flex justify-center p-4 bg-white rounded-xl">
+                        <canvas id="qrcodeCanvas" width="150" height="150"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 复制链接 -->
+                <div class="mb-4">
+                    <label class="block text-white/80 text-sm mb-2">🔗 分享链接</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="shareUrlInput" readonly class="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-white/40">
+                        <button id="copyShareUrl" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm whitespace-nowrap">
+                            复制
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 分享文案 -->
+                <div>
+                    <label class="block text-white/80 text-sm mb-2">📝 分享文案</label>
+                    <textarea id="shareText" readonly class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-white/40 resize-none h-20"></textarea>
+                    <button id="copyShareText" class="mt-2 w-full bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm border border-white/20">
+                        📋 复制文案
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="py-6 px-4 text-center">
+            <p class="text-white/60 text-sm">
+                © <span id="currentYear"></span> 跨年倒计时 | 用爱与希望迎接新的一年 晚梦出品必属精品
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
