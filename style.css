@@ -2805,3 +2805,58 @@ input[type="checkbox"]:focus {
 #sharePanel:not(.hidden) .share-content {
     animation: sharePanelIn 0.4s var(--ease-elastic);
 }
+
+/* ============================================
+   日期时间输入优化 - Date Time Input
+   ============================================ */
+input[type="date"],
+input[type="time"] {
+    color-scheme: dark;
+    position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+    color: white;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+    color: white;
+}
+
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="time"]::-webkit-datetime-edit-text {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field,
+input[type="time"]::-webkit-datetime-edit-hour-field,
+input[type="time"]::-webkit-datetime-edit-minute-field {
+    color: white;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus,
+input[type="time"]::-webkit-datetime-edit-hour-field:focus,
+input[type="time"]::-webkit-datetime-edit-minute-field:focus {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+}
