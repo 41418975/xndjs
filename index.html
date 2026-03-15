@@ -24,7 +24,11 @@
                             <span id="musicPlayerArrow" class="text-white/60 transition-transform duration-300">▲</span>
                         </button>
                         <div id="musicPlayerContent" class="hidden absolute right-0 mt-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden shadow-2xl z-50" style="min-width: 330px;">
-                            <iframe id="neteaseMusicFrame" frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="310" src="//music.163.com/outchain/player?type=0&id=17781138096&auto=1&height=430"></iframe>
+                            <div class="p-4 text-center">
+                                <p class="text-white/80 text-sm mb-3">🎵 网易云音乐</p>
+                                <iframe id="neteaseMusicFrame" frameborder="no" border="0" marginwidth="0" marginheight="0" width="280" height="280" src="https://music.163.com/outchain/player?type=0&id=17781138096&auto=1&height=430" style="border-radius: 8px;"></iframe>
+                                <p class="text-white/50 text-xs mt-2">如无法播放，请检查歌单是否有效</p>
+                            </div>
                         </div>
                     </div>
                     <button id="settingsBtn" class="bg-white/20 hover:bg-white/30 text-white w-10 h-10 rounded-full font-semibold transition-all duration-300 hover:scale-105 border border-white/30 flex items-center justify-center" title="设置">
